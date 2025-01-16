@@ -1,0 +1,88 @@
+---
+site_name: Lab Player Documentation
+repo_url: https://github.com/lftraining/lab-player-docs
+repo_name: lftraining/lab-player-docs
+extra_css:
+  - css/extra.css
+edit_uri: edit/main/docs
+theme:
+  name: material
+  features:
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - header.autohide
+    - navigation.indexes
+    - navigation.top
+    - navigation.tracking
+    - search.share
+    - search.suggest
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to light mode
+markdown_extensions:
+  - footnotes
+  - admonition
+  - attr_list
+  - sane_lists
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - toc:
+      permalink: true
+  - pymdownx.tabbed:
+      alternate_style: true
+plugins:
+  - awesome-pages
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
+  - search:
+      lang: en
+  - table-reader
+  - tags
+  # # These plugins are only run when the env var CI is set
+  # - group:
+  #     enabled: !ENV CI
+  #     plugins:
+  #       # Avoid running multirepo outside of the build as it makes local
+  #       # previewing very slow due to pulling the external repos
+  #       - multirepo:
+  #           cleanup: false
+  #           keep_docs_dir: false
+  #           repos:
+  #             - section: Faraday
+  #               section_path: Services
+  #               import_url: "https://github.com/LF-Certification/faraday?branch=main&edit_uri=edit/main/docs/"
+  #             - section: P3
+  #               section_path: Services
+  #               import_url: "https://github.com/LF-Certification/p3-platform?branch=main&docs_dir=platform-docs/docs"
+  #             - section: cert-tech-docs
+  #               import_url: "https://github.com/LF-Certification/cert-tech-docs?branch=main&edit_uri=edit/main/docs/"
+  #             - section: Lab Provisioning
+  #               section_path: Services
+  #               import_url: "https://github.com/LF-Certification/lab-provisioning-service?branch=main&edit_uri=edit/main/docs/"
