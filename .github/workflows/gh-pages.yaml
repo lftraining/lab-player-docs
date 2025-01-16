@@ -1,0 +1,54 @@
+---
+name: Publish GitHub Pages
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-devcontainer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (GitHub)
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push devcontainer image
+        uses: devcontainers/ci@v0.3
+        with:
+          imageName: ghcr.io/lf-certification/cert-tech-docs-devcontainer
+          cacheFrom: ghcr.io/lf-certification/cert-tech-docs-devcontainer
+          push: always
+
+  publish-gh-pages:
+    needs: [build-devcontainer]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (GitHub)
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run devcontainer task
+        uses: devcontainers/ci@v0.3
+        with:
+          imageName: ghcr.io/lf-certification/cert-tech-docs-devcontainer
+          cacheFrom: ghcr.io/lf-certification/cert-tech-docs-devcontainer
+          push: never
+          runCmd: |
+            set -e
+
+            poetry run mkdocs gh-deploy --force --no-history \
+                --remote-branch gh-pages
