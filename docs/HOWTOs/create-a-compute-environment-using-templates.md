@@ -3,6 +3,14 @@
 
 # Prerequisites
 
-- You have access to lftraining GitHub Organization.
-- You have access to LF-Certification GitHub Organization.
-- You have your environment setup and you have installed the required tools.
+!!!tip "You'll need access before begining"
+    For access refer to [request-access-to-systems.md](request-access-to-systems.md)
+
+Before you begin, ensure you:
+
+  - Have access to lftraining GitHub Organization.
+  - Have access to the following repos in the LF-Certification GitHub Organization.
+    - [LF-Certification/copier-compute-environment](https://github.com/LF-Certification/copier-compute-environment)
+    - LF-Certification/copier-multi-vm-shim
+    - LF-Certification/copier-product
+  - You have [setup your environment](setup-and-configure-your-environment.md) and with required tools.
