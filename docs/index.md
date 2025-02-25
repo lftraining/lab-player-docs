@@ -1,3 +1,3 @@
 # Lab Player Docs
 
-Hi eric!
+A collection of documentation and HOW TOs for working with Labs.
