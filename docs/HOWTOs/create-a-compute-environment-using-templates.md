@@ -1,217 +1,89 @@
-# HOW TO Creates a Compute Environment Using Templates
+# HOW TO Create a new Lab Compute Environment
 
+This guide explains how to create a new compute environment using our automated GitHub workflow.
 
-# Prerequisites
-
-!!!tip "You'll need access before begining"
-    For access refer to [request-access-to-systems.md](request-access-to-systems.md)
+## Prerequisites
 
 Before you begin, ensure you:
 
-  - Have access to lftraining GitHub Organization.
-  - Have access to the following repos in the LF-Certification GitHub Organization.
-    - [LF-Certification/copier-compute-environment](https://github.com/LF-Certification/copier-compute-environment)
-    - LF-Certification/copier-multi-vm-shim
-    - LF-Certification/copier-product
-  - You have [setup your environment](setup-and-configure-your-environment.md) and with required tools.
+- Have access to the `lftraining` GitHub Organization
+- You are a member of the `lab-authors` team
 
-## Create a feature branch from main
-open your devcontainer
+## Creating a New Compute Environment
+1. Open the lab repository in your browser
+2. Navigate to the Actions tab in the repository
+3. Locate and select the `New Compute Environment` workflow
+4. Click `Run workflow` and fill in the following parameters:
 
-Create a feature branch from main to work on the compute environment.
-
-!!!warning
-    must be named `feature/implement-<compute-environment>`
+  ![Repository Actions](../img/create-lab-compute-environment.gif)
 
 
-```bash
-git branch feature/implement-LFS2580004
-```
+### Workflow Parameters
 
-switch to your branch
+- **Environment Template** (required)
+  Choose one of the following templates:
 
-```bash
-git checkout feature/implement-LFS2580004
-```
+  - `k8s-single-node`: Single node Kubernetes environment
+  - `k8s-multi-node`: Multi-node Kubernetes environment
+  - `linux-single`: Single Linux host environment
+  - `linux-dual`: Dual Linux host environment
 
+- **Compute Environment** (required)
+  - Enter the prefix for your compute environment (e.g., "LFS25800")
 
-cd to `compute-environments/available`
+- **Use Workstation** (required)
+  - Choose whether to include a workstation VM for the student
+  - Defaults to `true`
 
+### Template Configurations
 
-### Render the copier-multi-vm-shim template
+Each template creates different VM configurations:
 
-!!!warning
-    Before rendering copier templates, ensure your git repository is clean.
+#### k8s-single-node
+- 1 control plane node
+- Optional workstation
 
-The `copier-multi-vm-shim` creates the base compute environment directory for the lab. it allows building, packing and publishing to be executed simultaneously on all virtual machine hosts needed in the lab
+#### k8s-multi-node
+- 1 control plane node
+- 1 worker node
+- Optional workstation
 
-!!!note
-    TODO explain the front end service
-    explain that the lf-training one has ssh keys
-    explain the default port
+#### linux-single
+- 1 Linux host
+- Optional workstation
 
+#### linux-dual
+- 2 Linux hosts
+- Optional workstation
 
-```bash
-copier copy --trust "gh:LF-Certification/copier-multi-vm-shim" ./LFS2580004
-🎤 What is the prefix for the compute environments?
-   LFS2580004
-🎤 What is the image for the front end service?
-   ghcr.io/lftraining/ttyd:1.7.7
-🎤 What is the port for the front end service?
-   7681
+## What Happens Next
 
-Copying from template version 1.4.0
-    create  .make
-    create  .make/lab
-    create  .make/lab/build
-    create  .make/lab/clean
-    create  .make/lab/package
-    create  .make/lab/publish
-    create  .make/lib.sh
-    create  Makefile
-    create  .copier-answers.yml
+After triggering the workflow:
 
-```
+1. A new feature branch is created (`feature/implement-<compute-environment>`)
+2. The necessary template files are generated based on your selection
+3. A draft pull request is automatically created
+4. You can then customize the environment further by working on the created branch
 
-Commit the changes to the repository
+!!!note "Next Steps"
+    After the workflow completes, review the generated pull request and make any necessary customizations to the environment configuration.
 
-```bash
-git add ./LFS2580004/ && git commit -sm"feat(LFS2580004): Initalize copier-multi-vm-shim"
-```
+### Finding Your Pull Request
 
+1. Navigate to the Pull Requests tab in the repository
+2. Look for a PR titled `Implement <your-compute-environment>`
+3. Open the PR to review the generated files
 
-### Render the virtual machine directories required for hosts within the lab compute-environment
+  ![Finding your PR](../img/finding-your-pr.gif)
 
-LFS2580004 Will require 2 VMs in the lab compute environment.
+### Working on the Environment Locally
 
-cd into the newly created directory:
+1. Navigate to your local repository
+2. In the PR, click the `Code` dropdown button
+3. Copy the command under "Checkout with GitHub CLI"
+4. Paste and run the command in your terminal:
+   ```bash
+   gh pr checkout <PR-NUMBER>
+   ```
 
-```bash
-cd ./LFS2580004
-```
-
-Apply the copier-compute-environment template for each host in the lab compute environment. We will start with `host1`
-
-!!!note
-    only `host<N>` are allowed as host names
-
-
-```bash
-copier copy --trust "gh:LF-Certification/copier-compute-environment" LFS2580004-host1
-🎤 What is the name of the compute environment?
-   LFS2580004-host1
-🎤 Which base image does the compute environment use?
-   ubuntu/kubernetes
-🎤 How many CPU cores does the item require?
-   2
-🎤 How much memory does the compute environment require?
-   4096M
-🎤 How much storage (MiB) does the compute environment require for the user layer?
-   300
-🎤 How much storage (GiB) does the compute environment require for the build layer?
-   5
-🎤 Does the compute environment require swap?
-   No
-🎤 List of ports to expose?
-    (Finish with 'Alt+Enter' or 'Esc then Enter')
-> [22]
-🎤 How are the scripts implemented?
-   bashp
-
-Copying from template version 1.2.2
-    create  .hooks
-    create  .hooks/lab
-    create  .hooks/lab/post-build.sh
-    create  .hooks/lab/pre-image.sh
-    create  .hooks/p3
-    create  .hooks/p3/post-build.sh
-    create  .hooks/p3/pre-image.sh
-    create  .hooks/temu
-    create  .hooks/temu/pre-image.sh
-    create  .hooks/post-clean.sh
-    create  .make
-    create  .make/jslinux
-    create  .make/jslinux/build
-    create  .make/jslinux/image
-    create  .make/jslinux/package
-    create  .make/jslinux/publish
-    create  .make/jslinux/run
-    create  .make/jslinux/test
-    create  .make/lab
-    create  .make/lab/build
-    create  .make/lab/image
-    create  .make/lab/package
-    create  .make/lab/publish
-    create  .make/lab/run
-    create  .make/lab/test
-    create  .make/lib.sh
-    create  .make/p3
-    create  .make/p3/Dockerfile
-    create  .make/p3/build
-    create  .make/p3/image
-    create  .make/p3/k8s
-    create  .make/p3/k8s/ssh
-    create  .make/p3/k8s/ssh/id_rsa
-    create  .make/p3/k8s/ssh/id_rsa.pub
-    create  .make/p3/package
-    create  .make/p3/publish
-    create  .make/p3/run
-    create  .make/p3/test
-    create  .make/qemu
-    create  .make/qemu/build
-    create  .make/qemu/cloud-init
-    create  .make/qemu/cloud-init/meta-data
-    create  .make/qemu/cloud-init/user-data
-    create  .make/qemu/image
-    create  .make/qemu/package
-    create  .make/qemu/publish
-    create  .make/qemu/run
-    create  .make/qemu/test
-    create  .make/qemu/lib.sh
-    create  .make/qti
-    create  .make/qti/build
-    create  .make/qti/image
-    create  .make/qti/lib.sh
-    create  .make/qti/package
-    create  .make/qti/publish
-    create  .make/temu
-    create  .make/temu/build
-    create  .make/temu/image
-    create  .make/temu/lib.sh
-    create  .make/temu/package
-    create  .make/temu/publish
-    create  .make/temu/run
-    create  .make/temu/test
-    create  Dockerfile
-    create  Makefile
-    create  assets
-    create  assets/format-candidate-layer.sh
-    create  assets/mkfs-hook.sh
-    create  cli.sh
-    create  k8s
-    create  k8s/base
-    create  k8s/base/kustomization.yaml
-    create  k8s/base/virtualized-env.yaml
-    create  k8s/base/manifest.yaml
-    create  scripts
-    create  scripts/answer.sh
-    create  scripts/build.sh
-    create  scripts/score.sh
-    create  scripts/setup.sh
-    create  temu
-    create  temu/.gitattributes
-    create  temu/.gitignore
-    create  temu/temu.cfg
-    create  temu/bbl64.bin
-    create  temu/kernel-riscv64-4.19.249-minimal.bin
-    create  temu/initrd
-    create  .envrc
-    create  .copier-answers.yml
-```
-
-
-Now that you have created the first virtual machine directory, commit your changes before rendering the second virtual machine directory.
-
-```bash
-git add ./LFS2580004-host1/ && git commit -sm"feat(host1): Initalize copier-compute-environment"
-```
+  ![Working locally](../img/working-locally.gif)
