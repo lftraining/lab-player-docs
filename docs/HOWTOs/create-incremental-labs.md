@@ -1,4 +1,4 @@
-# How to Create Incremental Labs
+# HOW TO Create Incremental Labs
 
 This guide shows you how to create incremental labs that provide a seamless learning experience across multiple lab environments in Kubernetes training courses.
 
@@ -36,6 +36,7 @@ compute-environments/
 ```
 
 Two key scripts control VM configuration:
+
 - `build.sh`: Runs during VM image creation to establish the base state
 - `setup.sh`: Runs when the VM starts up for runtime configuration
 
@@ -44,11 +45,13 @@ Two key scripts control VM configuration:
 To create an incremental lab that follows a previous lab:
 
 1. Identify the end state of the previous lab by reviewing:
+
    - Lab instructions from the previous section
    - Expected actions performed by the learner
    - Final state of all systems involved
 
 2. Decide which configurations belong in `build.sh` vs. `setup.sh`:
+
    - Use `build.sh` for persistent changes that can be baked into the VM
    - Use `setup.sh` for configuration that must occur at runtime
 
@@ -119,6 +122,7 @@ Let's look at a concrete example of creating incremental labs across a two-part 
 Learners set up a Kubernetes cluster from scratch in the first lab.
 
 **VM Configuration for Lab 3.1:**
+
 - Minimal setup required as learners build the cluster themselves
 - Simple `build.sh` scripts to prepare the environment
 
@@ -136,6 +140,7 @@ cp assets/kubeadm-config.yaml /root/
 This lab begins where 3.1 ended - with a working Kubernetes cluster.
 
 **VM Configuration for Lab 3.2:**
+
 - `build.sh` installs necessary components and configurations
 - `setup.sh` handles runtime initialization of the cluster
 
@@ -166,6 +171,7 @@ kubeadm init --config=/root/kubeadm-config.yaml --upload-certs --node-name=contr
 Worker node configuration follows similar patterns, with setup scripts handling runtime operations.
 
 You can find complete examples of incremental labs in the LFS258 course repositories:
+
 - [Lab 3.1 Environment](https://github.com/lftraining/LFS258-Labs/tree/feature/implement-LFS2580003/compute-environments/available/LFS2580003)
 - [Lab 3.2 Environment](https://github.com/lftraining/LFS258-Labs/tree/feature/implement-LFS2580003.2/compute-environments/available/LFS2580003.2)
 
@@ -174,18 +180,22 @@ These examples show how the second lab (3.2) builds upon the state established i
 ## Best Practices
 
 1. **Distinguish between build and runtime operations**
+
    - `build.sh`: Persistent changes, package installation, file setup
    - `setup.sh`: Runtime configuration, networking, service initialization
 
 2. **Replicate exactly what the learner would have done**
+
    - Follow the previous lab's instructions to understand what state to recreate
    - Ensure all files, directories, and configurations match the expected state
 
 3. **Consider dependencies between systems**
+
    - Ensure proper sequencing of operations across multiple VMs
    - Configure networking to allow systems to communicate
 
 4. **Test thoroughly**
+
    - Manually test the transition between labs
    - Verify that the environment picks up seamlessly where the previous lab left off
 
