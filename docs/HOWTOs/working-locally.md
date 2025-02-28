@@ -34,6 +34,7 @@ As a lab author, you have ownership over these specific directories and files:
 ### Off-Limits Areas
 
 Do not modify these platform components:
+
 - Any `Makefile` files
 - `.make/` directories and their contents
 - `Dockerfile` files
@@ -71,6 +72,7 @@ make clean
 ```
 
 **What it does**:
+
 - Stops all running VMs
 - Removes temporary files
 - Frees system resources
@@ -91,8 +93,13 @@ When a VM is running through `make shell`:
    - Exit a VM with the `exit` command
 
 3. **Accessing Your Scripts**: Inside each VM:
-   - Your scripts are accessible at `/item/controlplane/scripts/` or `/item/worker/scripts/`
-   - You can run them directly with `/item/controlplane/scripts/setup.sh`
+   - Your scripts are accessible at `/item/scripts/`
+   - You can run them directly with for example:
+
+     ```bash
+     /item/scripts/setup.sh
+     ```
+     
    - Changes take effect immediately without needing to restart the VM
 
 ## Conclusion
@@ -100,6 +107,7 @@ When a VM is running through `make shell`:
 By respecting the boundary between platform infrastructure and lab content, you can focus on creating high-quality educational experiences while the platform team maintains the underlying system.
 
 Remember:
+
 - Only modify files within your ownership areas
 - Only use the authorized Make targets (`shell` and `clean`)
 - When in doubt, contact the platform team or EI team rather than modifying platform code
