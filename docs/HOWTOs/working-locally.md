@@ -1,51 +1,108 @@
-# HOW TO Work Locally
+# HOW TO Work Locally with Lab Environments
 
-This guide shows you how to work on labs locally before testing manually in the staging cluster.
+As a lab author, you're responsible for creating effective learning experiences through well-crafted lab environments. The platform provides the infrastructure and tooling to run these environments, while you focus on the content and functionality.
+
+This guide explains the boundaries between platform code and lab author code, and shows you how to work effectively within these boundaries.
 
 ## Overview
 
-Working locally allows you to test your changes before pushing them to the staging cluster. This allows for faster iteration and easier debugging. It does NOT replace manually testing in the staging cluster.
+The lab platform separates infrastructure code (maintained by the platform team) from lab content (owned by lab authors). This separation ensures a consistent environment while giving authors flexibility to create effective labs.
 
-## Prerequisites
+## Lab Author Responsibility Boundaries
 
-- Basic knowledge of shell scripting
-- Understanding of the lab platform structure
-- Familiarity with Kubernetes concepts (for Kubernetes-specific labs)
+### What You Own
 
-## Spinning Up the Environment
+As a lab author, you have ownership over these specific directories and files:
 
-### 1. Inside the Lab Item Directory
-For example, if you are working on the lab 3.1 item for LFS258:
-```bash
-cd compute-environments/available/LFS2580003.1/
+```
+<lab-environment>
+├── controlplane/
+│   ├── assets/          # Your custom assets
+│   └── scripts/
+│       ├── answer.sh    # Your solution implementation
+│       ├── build.sh     # Your build-time setup
+│       └── setup.sh     # Your runtime setup
+├── instructions.en.md   # Your lab instructions
+└── worker/
+    ├── assets/          # Your custom assets
+    └── scripts/
+        ├── answer.sh    # Your solution implementation
+        ├── build.sh     # Your build-time setup
+        └── setup.sh     # Your runtime setup
 ```
 
-To build the entire lab environment run:
+### Off-Limits Areas
+
+Do not modify these platform components:
+- Any `Makefile` files
+- `.make/` directories and their contents
+- `Dockerfile` files
+- `.copier-answers.yml` files
+- `k8s` directory
+- `cli.sh` file
+- Any other infrastructure files
+
+## Authorized Make Targets
+
+As a lab author, you're authorized to use only these Make targets:
+
+### `make shell`
+
+**Purpose**: Starts the lab environment with all VMs for testing.
 ```bash
+# From the lab directory
 make shell
 ```
 
-This will open a tmux session with a pane for each VM. To switch panes you must press `Ctrl+B`, let go, and tap the arrow key that corresponds to the pane you want to switch to.
+**What it does**:
+- Builds VM images (if needed)
+- Starts all VMs in the environment
+- Creates a tmux session with a pane for each VM
+- Mounts your repository directory as `/item` in each VM
 
-### 2. VM Structure
+**Why it exists**: This target creates a functioning test environment that matches what learners will experience, allowing you to verify your lab content works correctly.
 
- Inside each VM, the VM directory is mounted in /item. Whatever you edit in your VM inside the /item directory will also update the repositroy. /item should be the directory that you are in when you run `make shell`.
- You can edit setup.sh by running:
- ```bash
- vim /item/scripts/setup.sh
- ```
+### `make clean`
 
-To test your changes, run:
+**Purpose**: Cleans up all resources after testing.
 ```bash
-./scripts/setup.sh
-```
-When you are done developing, exit out of each VM by running:
-```bash
-exit
-```
-### 3. Cleaning Up
-Run:
-```bash
+# From the lab directory
 make clean
 ```
-This will remove the VMs and clean up.
+
+**What it does**:
+- Stops all running VMs
+- Removes temporary files
+- Frees system resources
+
+**Why it exists**: This prevents resource conflicts and system slowdowns by properly cleaning up after testing.
+
+## Understanding the VM Environment
+
+When a VM is running through `make shell`:
+
+1. **Repository Mount**: Your repository directory is mounted at `/item` inside each VM.
+   - Changes made to files in `/item` from inside the VM are reflected in your local repository
+   - This allows you to test script changes without restarting the environment
+
+2. **Navigation Between VMs**: In the tmux session:
+   - Use `Ctrl+B arrow-key` to switch between VM panes
+   - Each pane represents a separate VM
+   - Exit a VM with the `exit` command
+
+3. **Accessing Your Scripts**: Inside each VM:
+   - Your scripts are accessible at `/item/controlplane/scripts/` or `/item/worker/scripts/`
+   - You can run them directly with `/item/controlplane/scripts/setup.sh`
+   - Changes take effect immediately without needing to restart the VM
+
+## Conclusion
+
+By respecting the boundary between platform infrastructure and lab content, you can focus on creating high-quality educational experiences while the platform team maintains the underlying system.
+
+Remember:
+- Only modify files within your ownership areas
+- Only use the authorized Make targets (`shell` and `clean`)
+- When in doubt, contact the platform team or EI team rather than modifying platform code
+
+This separation of concerns ensures a stable, consistent experience for both lab authors and learners.
+
